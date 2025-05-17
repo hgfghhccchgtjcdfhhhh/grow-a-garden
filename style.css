@@ -7,10 +7,10 @@ padding: 15px 20px;
 
 button {
 font-family: Times New Roman, times, serif;
-font-size: 150%;
+font-size: 100%;
 border: 20px;
 padding: 15px 20px;
-  background-color: lightblue;
+  background-color: darkblue;
   color: slategray;
 }
 
