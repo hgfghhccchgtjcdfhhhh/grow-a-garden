@@ -17,3 +17,5 @@ so it grows faster.
 
 ## Official Grow a Garden Wiki:
 https://growagarden.fandom.com
+
+*this site was powered by Github and Cloudflare Pages*
