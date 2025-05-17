@@ -18,9 +18,16 @@ h1 {
   font-family: Times New Roman, times, serif;
   background-color: darkgray;
   color: gray;
+  border: 4px solid white;
 }
 
 p {
   font-family: Times New Roman, times, serif;
+  color: gray;
+}
+
+h2 {
+  font-family: Times New Roman, times, serif;
+  background-color: darkgray;
   color: gray;
 }
