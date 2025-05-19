@@ -32,39 +32,79 @@ h2 {
   color: gray;
 }
 
-#custom-alert {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+.alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 300px;
+  max-width: 400px;
+  padding: 15px 25px;
+  background: #fff;
+  border-radius: 6px;
+  border: 2px solid #444;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  color: #222;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.alert-box {
-    background: #222;
-    color: #fff;
-    padding: 20px;
-    border: 3px solid goldenrod;
-    width: 300px;
-    text-align: center;
-    box-shadow: 0 0 15px rgba(0,0,0,0.8);
+.alert.show {
+  opacity: 1;
+  pointer-events: auto;
+  animation: alertFadeIn 0.5s forwards;
 }
 
-.alert-box button {
-    background: goldenrod;
-    color: black;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-weight: bold;
+@keyframes alertFadeIn {
+  from {opacity: 0; transform: translateX(-50%) translateY(-20px);}
+  to {opacity: 1; transform: translateX(-50%) translateY(0);}
 }
 
-.hidden {
-    display: none;
+.alert-close {
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+  color: #666;
+  user-select: none;
+  padding-left: 15px;
+}
+
+.alert-close:hover {
+  color: #000;
+}
+
+.alert-content {
+  flex-grow: 1;
+}
+
+.alert.success {
+  border-color: #4CAF50;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.alert.error {
+  border-color: #f44336;
+  background: #ffebee;
+  color: #c62828;
+}
+
+.alert.warning {
+  border-color: #ff9800;
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.alert.info {
+  border-color: #2196f3;
+  background: #e3f2fd;
+  color: #1565c0;
 }
