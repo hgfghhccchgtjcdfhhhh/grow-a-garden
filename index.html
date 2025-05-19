@@ -10,6 +10,20 @@
   <span class="alert-close">&times;</span>
 </div>
   <script>
+const alertBox = document.getElementById('custom-alert');
+const alertContent = alertBox.querySelector('.alert-content');
+const alertClose = alertBox.querySelector('.alert-close');
+
+function showAlert(message, type = 'info') {
+  alertContent.textContent = message;
+  alertBox.className = `alert ${type} show`;
+}
+
+alertClose.addEventListener('click', () => {
+  alertBox.classList.remove('show');
+});
+</script>
+  <script>
     alert('Welcome to a Fanmade grow a garden page! Press close to close this message.')
   </script>
   <h1>Main Page 🔖</h1>
