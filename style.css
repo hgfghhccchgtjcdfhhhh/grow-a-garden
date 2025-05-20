@@ -1,5 +1,5 @@
 body {
-border: 4px solid white;
+border: 6px solid black;
 font-family: Times New Roman, times, serif;
 background-color: pink;
 padding: 15px 20px;
@@ -8,7 +8,7 @@ padding: 15px 20px;
 button {
 font-family: Times New Roman, times, serif;
 font-size: 130%;
-border: 4px solid white;
+border: 4px solid black;
 padding: 15px 20px;
   background-color: darkgray;
   color: gray;
@@ -18,12 +18,12 @@ h1 {
   font-family: Times New Roman, times, serif;
   background-color: lightpink;
   color: gray;
-  border: 4px solid white;
+  border: 4px solid black;
 }
 
 p {
   font-family: Times New Roman, times, serif;
-  color: white;
+  color: black;
 }
 
 h2 {
