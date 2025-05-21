@@ -11,6 +11,18 @@
         <button class="custom-alert-button" onclick="closeCustomAlert()">Close</button>
     </div>
   </div>
+    <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+    <script>
+        function alert(message) {
+            document.getElementById("custom-alert-message").textContent = message;
+            document.body.classList.add("alert-active");
+            document.getElementById("alert-sound").play();
+        }
+        
+        function closeCustomAlert() {
+            document.body.classList.remove("alert-active");
+        }
+        
   <script>
     alert('Welcome to a Fanmade grow a garden page! Press close to close this message.')
   </script>
