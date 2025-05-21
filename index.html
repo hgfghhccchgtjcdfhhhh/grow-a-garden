@@ -5,24 +5,12 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="custom-alert" class="alert">
-  <span class="alert-content"></span>
-  <span class="alert-close">&times;</span>
-</div>
-  <script>
-const alertBox = document.getElementById('custom-alert');
-const alertContent = alertBox.querySelector('.alert-content');
-const alertClose = alertBox.querySelector('.alert-close');
-
-function showAlert(message, type = 'info') {
-  alertContent.textContent = message;
-  alertBox.className = `alert ${type} show`;
-}
-
-alertClose.addEventListener('click', () => {
-  alertBox.classList.remove('show');
-});
-</script>
+    <div class="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <p id="custom-alert-message">Default message</p>
+        <button class="custom-alert-button" onclick="closeCustomAlert()">Close</button>
+    </div>
+  </div>
   <script>
     alert('Welcome to a Fanmade grow a garden page! Press close to close this message.')
   </script>
