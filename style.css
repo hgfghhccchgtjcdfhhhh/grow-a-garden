@@ -1,7 +1,7 @@
 body {
 border: 6px solid black;
 font-family: Times New Roman, times, serif;
-background-color: #4E71FF;
+background-color: #F2F2F2;
 padding: 15px 20px;
 }
 
@@ -10,25 +10,25 @@ font-family: Times New Roman, times, serif;
 font-size: 130%;
 border: 4px solid black;
 padding: 15px 20px;
-  background-color: #BBFBBFF;
+  background-color: gray;
   color: gray;
 }
 
 h1 {
   font-family: Times New Roman, times, serif;
-  background-color: #4E71FF;
-  color: gray;
+  background-color: #EAE4D5;
+  color: black;
   border: 4px solid black;
 }
 
 p {
   font-family: Times New Roman, times, serif;
-  color: #8DD8FF;
+  color: #B6B09F;
 }
 
 h2 {
   font-family: Times New Roman, times, serif;
-  background-color: BDD8FF;
+  background-color: #EAE4D5
   color: black;
 }
 
