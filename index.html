@@ -1,110 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Grow a Garden - Sign Up</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  </head>
-  <body>
-    <div id="app"></div>
-    <div class="custom-alert-overlay">
-      <div class="custom-alert-box">
-        <p id="custom-alert-message">Default message</p>
-        <button class="custom-alert-button" onclick="closeCustomAlert()">Close</button>
-      </div>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grow a Garden - Sign Up</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div class="custom-alert-overlay">
+    <div class="custom-alert-box">
+      <p id="custom-alert-message">Default message</p>
+      <button class="custom-alert-button" onclick="closeCustomAlert()">Close</button>
     </div>
-    <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
-    <script>
-      function alert(message) {
-        document.getElementById("custom-alert-message").textContent = message;
-        document.body.classList.add("alert-active");
-        document.getElementById("alert-sound").play();
+  </div>
+  <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+  <div id="root"></div>
+
+  <script>
+    function alert(message) {
+      document.getElementById("custom-alert-message").textContent = message;
+      document.body.classList.add("alert-active");
+      document.getElementById("alert-sound").play();
+    }
+    function closeCustomAlert() {
+      document.body.classList.remove("alert-active");
+    }
+  </script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    function SignUpForm() {
+      const [username, setUsername] = useState("");
+      const [email, setEmail] = useState("");
+      const [password, setPassword] = useState("");
+      const [submitting, setSubmitting] = useState(false);
+
+      function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       }
 
-      function closeCustomAlert() {
-        document.body.classList.remove("alert-active");
-      }
-    </script>
-
-    <script type="text/babel" data-type="module" data-presets="react,typescript">
-      const { useState } = React;
-
-      function SignUpForm() {
-        const [username, setUsername] = useState('');
-        const [email, setEmail] = useState('');
-        const [password, setPassword] = useState('');
-
-        function validateEmail(email) {
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        }
-
-        function validateUsername(name) {
-          return /^[a-zA-Z0-9_]{3,20}$/.test(name);
-        }
-
-        function validatePassword(pw) {
-          return pw.length >= 6;
-        }
-
-        function handleSubmit(e) {
-          e.preventDefault();
-          const token = window.turnstile.getResponse();
-          if (!token) {
-            alert("Complete the CAPTCHA");
-            return;
-          }
-
-          if (!validateUsername(username)) {
-            alert("Invalid username (alphanumeric, 3–20 chars)");
-            return;
-          }
-
-          if (!validateEmail(email)) {
-            alert("Invalid email");
-            return;
-          }
-
-          if (!validatePassword(password)) {
-            alert("Password must be at least 6 characters");
-            return;
-          }
-
-          const users = JSON.parse(localStorage.getItem("users") || "[]");
-          users.push({ username, email, password });
-          localStorage.setItem("users", JSON.stringify(users));
-          alert("Registered successfully");
-          setUsername('');
-          setEmail('');
-          setPassword('');
-          window.turnstile.reset();
-        }
-
-        return (
-          <main className="signup-container">
-            <h1>Grow a Garden</h1>
-            <form onSubmit={handleSubmit}>
-              <label>Username</label>
-              <input value={username} onChange={e => setUsername(e.target.value)} required />
-
-              <label>Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-
-              <label>Password</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-              
-              <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <div className="cf-turnstile" data-sitekey="0x4AAAAAABeJl4G99R74BCQt"></div>
-              <button type="submit" onclick="window.location.href='https://grow-a-garden-fanmade.pages.dev'">Register</button>
-            </form>
-          </main>
-        );
+      function validateUsername(name) {
+        return /^[a-zA-Z0-9_]{3,20}$/.test(name);
       }
 
-      ReactDOM.createRoot(document.getElementById("app")).render(<SignUpForm />);
-    </script>
-  </body>
+      function validatePassword(pw) {
+        return pw.length >= 6;
+      }
+
+      async function handleSubmit(e) {
+        e.preventDefault();
+        if (!validateUsername(username)) {
+          alert("Username must be 3-20 chars and only letters, numbers, or underscore.");
+          return;
+        }
+        if (!validateEmail(email)) {
+          alert("Please enter a valid email.");
+          return;
+        }
+        if (!validatePassword(password)) {
+          alert("Password must be at least 6 characters.");
+          return;
+        }
+
+        const token = window.turnstile.getResponse();
+        if (!token) {
+          alert("Please complete the CAPTCHA.");
+          return;
+        }
+
+        setSubmitting(true);
+
+        const data = { username, email, password, captchaToken: token };
+
+        try {
+          const res = await fetch("/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          if (res.ok) {
+            alert("Signup successful!");
+            setUsername("");
+            setEmail("");
+            setPassword("");
+            window.turnstile.reset();
+          } else {
+            const json = await res.json();
+            alert("Signup failed: " + (json.error || "Unknown error"));
+          }
+        } catch (err) {
+          alert("Signup failed: " + err.message);
+        } finally {
+          setSubmitting(false);
+        }
+      }
+
+      return (
+        <main className="signup-container">
+          <h1>Grow a Garden</h1>
+          <form onSubmit={handleSubmit}>
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              name="username"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              required
+            />
+
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+
+            <div className="cf-turnstile" data-sitekey="0x4AAAAAABeJl4G99R74BCQt"></div>
+
+            <button type="submit" disabled={submitting}>
+              {submitting ? "Registering..." : "Register"}
+            </button>
+          </form>
+        </main>
+      );
+    }
+
+    ReactDOM.render(<SignUpForm />, document.getElementById("root"));
+  </script>
+</body>
 </html>
