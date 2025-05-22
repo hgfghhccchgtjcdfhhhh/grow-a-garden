@@ -1,70 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Grow a Garden Fanmade</title>
-<link rel="stylesheet" href="style.css" />
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-</head>
-<body>
-  <div class="custom-alert-overlay" id="custom-alert">
-    <div class="custom-alert-box">
-      <p id="custom-alert-message">Default message</p>
-      <button class="custom-alert-button" onclick="closeCustomAlert()">Close</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hgland Coding Hub - Sign Up</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div class="custom-alert-overlay">
+      <div class="custom-alert-box">
+        <p id="custom-alert-message">Default message</p>
+        <button class="custom-alert-button" onclick="closeCustomAlert()">Close</button>
+      </div>
     </div>
-  </div>
-  <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
-  <script>
-    function alert(message) {
-      document.getElementById("custom-alert-message").textContent = message;
-      document.body.classList.add("alert-active");
-      document.getElementById("alert-sound").play();
-    }
-    function closeCustomAlert() {
-      document.body.classList.remove("alert-active");
-    }
-  </script>
-  <main class="signup-container">
-    <h1>Grow a Garden Fanmade</h1>
-    <form id="signup-form" method="POST" action="/signup">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" required />
-
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required />
-
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required />
-
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAABeJl4G99R74BCQt"></div>
-
-      <button type="submit">Register</button>
-    </form>
-  </main>
-
-  <script>
-    const form = document.getElementById('signup-form');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const token = window.turnstile.getResponse();
-      if (!token) {
-        alert('Please complete the CAPTCHA');
-        return;
+    <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+    <script>
+      function alert(message) {
+        document.getElementById("custom-alert-message").textContent = message;
+        document.body.classList.add("alert-active");
+        document.getElementById("alert-sound").play();
       }
-      const data = {
-        username: form.username.value,
-        email: form.email.value,
-        password: form.password.value,
-        captchaToken: token,
-      };
-      console.log('Submitting', data);
-      alert('Signup submitted!');
-      form.reset();
-      window.turnstile.reset();
-    });
-  </script>
 
-  <button onclick="window.location.href='mainpage.html'">Go to Main Page.</button>
-</body>
+      function closeCustomAlert() {
+        document.body.classList.remove("alert-active");
+      }
+    </script>
+
+    <script type="text/babel" data-type="module" data-presets="react,typescript">
+      const { useState } = React;
+
+      function SignUpForm() {
+        const [username, setUsername] = useState('');
+        const [email, setEmail] = useState('');
+        const [password, setPassword] = useState('');
+
+        function validateEmail(email) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validateUsername(name) {
+          return /^[a-zA-Z0-9_]{3,20}$/.test(name);
+        }
+
+        function validatePassword(pw) {
+          return pw.length >= 6;
+        }
+
+        function handleSubmit(e) {
+          e.preventDefault();
+          const token = window.turnstile.getResponse();
+          if (!token) {
+            alert("Complete the CAPTCHA");
+            return;
+          }
+
+          if (!validateUsername(username)) {
+            alert("Invalid username (alphanumeric, 3–20 chars)");
+            return;
+          }
+
+          if (!validateEmail(email)) {
+            alert("Invalid email");
+            return;
+          }
+
+          if (!validatePassword(password)) {
+            alert("Password must be at least 6 characters");
+            return;
+          }
+
+          const users = JSON.parse(localStorage.getItem("users") || "[]");
+          users.push({ username, email, password });
+          localStorage.setItem("users", JSON.stringify(users));
+          alert("Registered successfully");
+          setUsername('');
+          setEmail('');
+          setPassword('');
+          window.turnstile.reset();
+        }
+
+        return (
+          <main className="signup-container">
+            <h1>Hgland Coding Hub</h1>
+            <form onSubmit={handleSubmit}>
+              <label>Username</label>
+              <input value={username} onChange={e => setUsername(e.target.value)} required />
+
+              <label>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+
+              <label>Password</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+
+              <div className="cf-turnstile" data-sitekey="0x4AAAAAABeJl4G99R74BCQt"></div>
+              <button type="submit">Register</button>
+            </form>
+          </main>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("app")).render(<SignUpForm />);
+    </script>
+  </body>
 </html>
