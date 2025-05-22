@@ -1,17 +1,40 @@
-const fs = require("fs");
-const path = require("path");
+import fs from 'fs/promises'
+import path from 'path'
 
-export async function onRequestPost(context) {
-  const { email, username, password } = await context.request.json();
-  const dbPath = path.join(__dirname, "../../data/users.json");
+const dbPath = path.resolve(process.cwd(), 'database.json')
 
-  if (!fs.existsSync(dbPath)) {
-    fs.writeFileSync(dbPath, "[]");
+type User = {
+  id: string
+  email: string
+  username: string
+  passwordHash: string
+}
+
+async function readDatabase(): Promise<User[]> {
+  try {
+    const data = await fs.readFile(dbPath, 'utf-8')
+    return JSON.parse(data)
+  } catch {
+    return []
   }
+}
 
-  const users = JSON.parse(fs.readFileSync(dbPath, "utf8"));
-  users.push({ email, username, password });
-  fs.writeFileSync(dbPath, JSON.stringify(users, null, 2));
+async function writeDatabase(users: User[]): Promise<void> {
+  await fs.writeFile(dbPath, JSON.stringify(users, null, 2), 'utf-8')
+}
 
-  return new Response("User registered successfully", { status: 200 });
+export async function addUser(user: User): Promise<void> {
+  const users = await readDatabase()
+  users.push(user)
+  await writeDatabase(users)
+}
+
+export async function findUserByEmail(email: string): Promise<User | undefined> {
+  const users = await readDatabase()
+  return users.find(u => u.email.toLowerCase() === email.toLowerCase())
+}
+
+export async function findUserByUsername(username: string): Promise<User | undefined> {
+  const users = await readDatabase()
+  return users.find(u => u.username.toLowerCase() === username.toLowerCase())
 }
