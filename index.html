@@ -3,147 +3,229 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Grow a Garden - Sign Up</title>
-<link rel="stylesheet" href="style.css" />
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<title>Grow a Garden - Signup</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<style>
+body {
+  background-color: black;
+  border: 2px solid lightslategray;
+  padding: 15px 20px;
+  font-family: 'Times New Roman', Times, serif;
+  color: gray;
+}
+h1, h2, p {
+  color: gray;
+}
+button {
+  background-color: #2c2c2c;
+  border: 2px solid #1a1a1a;
+  color: #f5f5f5;
+  padding: 15px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+button:hover {
+  background-color: #3d3d3d;
+  border-color: #444;
+  color: #ffffff;
+}
+button:active {
+  background-color: #1a1a1a;
+  border-color: #555;
+  color: #dddddd;
+}
+.custom-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+.custom-alert-box {
+  background-color: #111;
+  color: #fff;
+  padding: 30px 40px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+  width: 350px;
+  border: 4px solid white;
+}
+.custom-alert-button {
+  margin-top: 20px;
+  background-color: #f04a4a;
+  color: #fff;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.custom-alert-button:hover {
+  background-color: #d03737;
+}
+body.alert-active .custom-alert-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+label, input {
+  display: block;
+  margin: 10px 0;
+  width: 100%;
+}
+input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid gray;
+  background-color: #222;
+  color: white;
+  font-size: 1em;
+}
+.signup-container {
+  max-width: 400px;
+  margin: 40px auto;
+}
+</style>
 </head>
 <body>
-  <div class="custom-alert-overlay">
-    <div class="custom-alert-box">
-      <p id="custom-alert-message">Default message</p>
-      <button class="custom-alert-button" onclick="closeCustomAlert()">Close</button>
-    </div>
+<div id="root"></div>
+<div class="custom-alert-overlay" id="alert-overlay">
+  <div class="custom-alert-box">
+    <p id="alert-message"></p>
+    <button class="custom-alert-button" id="alert-close">Close</button>
   </div>
-  <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+</div>
 
-  <div id="root"></div>
+<script type="text/babel" data-type="module" data-presets="react" data-plugins="proposal-class-properties">
 
-  <script>
-    function alert(message) {
-      document.getElementById("custom-alert-message").textContent = message;
-      document.body.classList.add("alert-active");
-      document.getElementById("alert-sound").play();
+const { useState, useEffect } = React
+
+function CustomAlert({ message, onClose }) {
+  useEffect(() => {
+    if (message) {
+      document.body.classList.add('alert-active')
+    } else {
+      document.body.classList.remove('alert-active')
     }
-    function closeCustomAlert() {
-      document.body.classList.remove("alert-active");
+  }, [message])
+  if (!message) return null
+  return (
+    <div className="custom-alert-overlay" onClick={onClose}>
+      <div className="custom-alert-box" onClick={e => e.stopPropagation()}>
+        <p>{message}</p>
+        <button className="custom-alert-button" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  )
+}
+
+function SignupForm() {
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
+  const [captchaToken, setCaptchaToken] = useState('')
+  const [turnstileWidgetId, setTurnstileWidgetId] = useState(null)
+
+  useEffect(() => {
+    if (window.turnstile && !turnstileWidgetId) {
+      const widgetId = window.turnstile.render(document.getElementById('turnstile-widget'), {
+        sitekey: '0x4AAAAAABeJl4G99R74BCQt',
+        callback: (token) => setCaptchaToken(token),
+        'error-callback': () => setAlertMessage('Captcha error, please try again'),
+        'expired-callback': () => setCaptchaToken('')
+      })
+      setTurnstileWidgetId(widgetId)
     }
-  </script>
+  }, [turnstileWidgetId])
 
-  <script type="text/babel">
-    const { useState } = React;
+  function validateUsername(u) {
+    return /^[a-zA-Z0-9_]{3,20}$/.test(u)
+  }
+  function validateEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
+  }
+  function validatePassword(p) {
+    return p.length >= 6
+  }
 
-    function SignUpForm() {
-      const [username, setUsername] = useState("");
-      const [email, setEmail] = useState("");
-      const [password, setPassword] = useState("");
-      const [submitting, setSubmitting] = useState(false);
-
-      function validateEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      }
-
-      function validateUsername(name) {
-        return /^[a-zA-Z0-9_]{3,20}$/.test(name);
-      }
-
-      function validatePassword(pw) {
-        return pw.length >= 6;
-      }
-
-      async function handleSubmit(e) {
-        e.preventDefault();
-        if (!validateUsername(username)) {
-          alert("Username must be 3-20 chars and only letters, numbers, or underscore.");
-          return;
-        }
-        if (!validateEmail(email)) {
-          alert("Please enter a valid email.");
-          return;
-        }
-        if (!validatePassword(password)) {
-          alert("Password must be at least 6 characters.");
-          return;
-        }
-
-        const token = window.turnstile.getResponse();
-        if (!token) {
-          alert("Please complete the CAPTCHA.");
-          return;
-        }
-
-        setSubmitting(true);
-
-        const data = { username, email, password, captchaToken: token };
-
-        try {
-          const res = await fetch("/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-          });
-          if (res.ok) {
-            alert("Signup successful!");
-            setUsername("");
-            setEmail("");
-            setPassword("");
-            window.turnstile.reset();
-          } else {
-            const json = await res.json();
-            alert("Signup failed: " + (json.error || "Unknown error"));
-          }
-        } catch (err) {
-          alert("Signup failed: " + err.message);
-        } finally {
-          setSubmitting(false);
-        }
-      }
-
-      return (
-        <main className="signup-container">
-          <h1>Grow a Garden</h1>
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              name="username"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              required
-            />
-
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-            />
-
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-            />
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-            <div className="cf-turnstile" data-sitekey="0x4AAAAAABeJl4G99R74BCQt"></div>
-
-            <button type="submit" disabled={submitting}>
-              {submitting ? "Registering..." : "Register"}
-            </button>
-          </form>
-        </main>
-      );
+  function resetForm() {
+    setUsername('')
+    setEmail('')
+    setPassword('')
+    setCaptchaToken('')
+    if(window.turnstile && turnstileWidgetId !== null) {
+      window.turnstile.reset(turnstileWidgetId)
     }
+  }
 
-    ReactDOM.render(<SignUpForm />, document.getElementById("root"));
-  </script>
+  function handleSubmit(e) {
+    e.preventDefault()
+    if (!validateUsername(username)) {
+      setAlertMessage('Invalid username (3-20 chars, letters, numbers, underscore)')
+      return
+    }
+    if (!validateEmail(email)) {
+      setAlertMessage('Invalid email')
+      return
+    }
+    if (!validatePassword(password)) {
+      setAlertMessage('Password must be at least 6 characters')
+      return
+    }
+    if (!captchaToken) {
+      setAlertMessage('Complete the CAPTCHA')
+      return
+    }
+    const users = JSON.parse(localStorage.getItem('users') || '[]')
+    if(users.find(u => u.username.toLowerCase() === username.toLowerCase())){
+      setAlertMessage('Username already taken')
+      return
+    }
+    if(users.find(u => u.email.toLowerCase() === email.toLowerCase())){
+      setAlertMessage('Email already registered')
+      return
+    }
+    users.push({ username, email, password })
+    localStorage.setItem('users', JSON.stringify(users))
+    setAlertMessage('Signup successful')
+    resetForm()
+  }
+
+  return (
+    <>
+    <div className="signup-container">
+      <h1>Grow a Garden</h1>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="username">Username</label>
+        <input id="username" type="text" value={username} onChange={e => setUsername(e.target.value)} required />
+        <label htmlFor="email">Email</label>
+        <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+        <label htmlFor="password">Password</label>
+        <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+        <div id="turnstile-widget" className="cf-turnstile" data-sitekey="0x4AAAAAABeJl4G99R74BCQt"></div>
+        <button type="submit">Register</button>
+      </form>
+    </div>
+    <CustomAlert message={alertMessage} onClose={() => setAlertMessage('')} />
+    </>
+  )
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<SignupForm />)
+
+</script>
 </body>
 </html>
