@@ -3,12 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hgland Coding Hub - Sign Up</title>
+    <title>Grow a Garden - Sign Up</title>
     <link rel="stylesheet" href="style.css" />
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   </head>
   <body>
     <div id="app"></div>
@@ -86,7 +85,7 @@
 
         return (
           <main className="signup-container">
-            <h1>Hgland Coding Hub</h1>
+            <h1>Grow a Garden</h1>
             <form onSubmit={handleSubmit}>
               <label>Username</label>
               <input value={username} onChange={e => setUsername(e.target.value)} required />
@@ -96,8 +95,9 @@
 
               <label>Password</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-
-              <div className="cf-turnstile" data-sitekey="0x4AAAAAABeJl4G99R74BCQt"></div>
+              
+              <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <div className="cf-turnstile" data-sitekey="0x4AAAAAABeJl4G99R74BCQt"></div>
               <button type="submit" onclick="window.location.href='https://grow-a-garden-fanmade.pages.dev'">Register</button>
             </form>
           </main>
