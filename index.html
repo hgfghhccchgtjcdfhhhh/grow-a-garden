@@ -1,88 +1,241 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Grow a Garden - Sign Up</title>
-    <meta charset="UTF-8" />
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <style>
-      body {
-        background-color: black;
-        border: 2px solid lightslategray;
-        padding: 15px 20px;
-        font-family: 'Times New Roman', Times, serif;
-        color: gray;
-      }
-      h1, h2, p {
-        color: gray;
-      }
-      button {
-        background-color: #2c2c2c;
-        border: 2px solid #1a1a1a;
-        color: #f5f5f5;
-        padding: 15px 20px;
-        cursor: pointer;
-        border-radius: 8px;
-        transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-      }
-      button:hover {
-        background-color: #3d3d3d;
-        border-color: #444;
-        color: #ffffff;
-      }
-      button:active {
-        background-color: #1a1a1a;
-        border-color: #555;
-        color: #dddddd;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grow a Garden - Signup</title>
+<style>
+body {
+  background-color: black;
+  border: 2px solid lightslategray;
+  padding: 15px 20px;
+  font-family: 'Times New Roman', Times, serif;
+  color: gray;
+}
+h1, h2, p {
+  color: gray;
+}
+button {
+  background-color: #2c2c2c;
+  border: 2px solid #1a1a1a;
+  color: #f5f5f5;
+  padding: 15px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+button:hover {
+  background-color: #3d3d3d;
+  border-color: #444;
+  color: #ffffff;
+}
+button:active {
+  background-color: #1a1a1a;
+  border-color: #555;
+  color: #dddddd;
+}
+.custom-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+.custom-alert-box {
+  background-color: #111;
+  color: #fff;
+  padding: 30px 40px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+  width: 350px;
+  border: 4px solid white;
+}
+.custom-alert-button {
+  margin-top: 20px;
+  background-color: #f04a4a;
+  color: #fff;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.custom-alert-button:hover {
+  background-color: #d03737;
+}
+body.alert-active .custom-alert-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+form {
+  max-width: 400px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+input {
+  background-color: #1a1a1a;
+  border: 2px solid lightslategray;
+  padding: 15px 10px;
+  font-size: 16px;
+  color: white;
+  border-radius: 8px;
+}
+label {
+  color: gray;
+  font-weight: bold;
+  font-size: 14px;
+}
+</style>
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+<div id="root"></div>
 
-    <script type="text/babel" data-type="module" data-presets="react,typescript">
-      type FormData = {
-        email: string;
-        username: string;
-        password: string;
-      };
+<script type="text/babel" data-type="module" data-presets="react,typescript">
 
-      function SignupForm() {
-        const [formData, setFormData] = React.useState<FormData>({
-          email: "",
-          username: "",
-          password: ""
-        });
+const { useState, useEffect, useRef } = React
 
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-          setFormData({ ...formData, [e.target.name]: e.target.value });
-        };
+function CustomAlert({ message, onClose }) {
+  useEffect(() => {
+    document.body.classList.add('alert-active')
+    return () => document.body.classList.remove('alert-active')
+  }, [])
+  return (
+    <div className="custom-alert-overlay">
+      <div className="custom-alert-box">
+        <p>{message}</p>
+        <button className="custom-alert-button" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  )
+}
 
-        const handleSubmit = async (e: React.FormEvent) => {
-          e.preventDefault();
-          const res = await fetch("/functions/database.tsx", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData)
-          });
-          alert((await res.text()) || "Submitted.");
-        };
+export default function SignupForm() {
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [alert, setAlert] = useState(null)
+  const turnstileRef = useRef(null)
+  const [token, setToken] = useState(null)
 
-        return (
-          <form onSubmit={handleSubmit}>
-            <h2>Sign Up</h2>
-            <input name="email" type="email" placeholder="Email" required onChange={handleChange} /><br /><br />
-            <input name="username" type="text" placeholder="Username" required onChange={handleChange} /><br /><br />
-            <input name="password" type="password" placeholder="Password" required onChange={handleChange} /><br /><br />
-            <div className="cf-turnstile" data-sitekey="0x4AAAAAABeDBe4pSr2MmYDv"></div><br />
-            <button type="submit">Submit</button>
-          </form>
-        );
+  useEffect(() => {
+    if(window.turnstile && turnstileRef.current) {
+      window.turnstile.render(turnstileRef.current, {
+        sitekey: "0x4AAAAAABeDBe4pSr2MmYDv", 
+        callback: (token) => setToken(token),
+        'error-callback': () => setToken(null),
+        'expired-callback': () => setToken(null)
+      })
+    }
+  }, [])
+
+  function validateEmail(email) {
+    return /\S+@\S+\.\S+/.test(email)
+  }
+
+  function validateUsername(name) {
+    return name.length >= 3 && /^[a-zA-Z0-9_]+$/.test(name)
+  }
+
+  function validatePassword(pw) {
+    return pw.length >= 6
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault()
+    if(!validateEmail(email)) {
+      setAlert("Enter a valid email")
+      return
+    }
+    if(!validateUsername(username)) {
+      setAlert("Username must be 3+ characters, alphanumeric or underscore")
+      return
+    }
+    if(!validatePassword(password)) {
+      setAlert("Password must be at least 6 characters")
+      return
+    }
+    if(!token) {
+      setAlert("Please complete the CAPTCHA")
+      return
+    }
+
+    try {
+      await fakeSignup({ email, username, password, captchaToken: token })
+      setAlert("Signup successful!")
+      setEmail('')
+      setUsername('')
+      setPassword('')
+      setToken(null)
+      if(window.turnstile) {
+        window.turnstile.reset()
       }
+    } catch {
+      setAlert("Signup failed. Try again later.")
+    }
+  }
 
-      ReactDOM.render(<SignupForm />, document.getElementById("root"));
-    </script>
-  </body>
+  async function fakeSignup(data) {
+    return new Promise((resolve) => setTimeout(resolve, 1000))
+  }
+
+  return (
+    <>
+      {alert && <CustomAlert message={alert} onClose={() => setAlert(null)} />}
+      <h1>Grow a Garden - Sign Up</h1>
+      <form onSubmit={onSubmit} noValidate>
+        <label htmlFor="email">Email</label>
+        <input 
+          id="email" 
+          type="email" 
+          value={email} 
+          onChange={e => setEmail(e.target.value)} 
+          required
+          autoComplete="email"
+          spellCheck="false"
+        />
+        <label htmlFor="username">Username</label>
+        <input 
+          id="username" 
+          type="text" 
+          value={username} 
+          onChange={e => setUsername(e.target.value)} 
+          required
+          spellCheck="false"
+          autoComplete="username"
+        />
+        <label htmlFor="password">Password</label>
+        <input 
+          id="password" 
+          type="password" 
+          value={password} 
+          onChange={e => setPassword(e.target.value)} 
+          required
+          autoComplete="new-password"
+        />
+        <div ref={turnstileRef} />
+        <button type="submit">Sign Up</button>
+      </form>
+    </>
+  )
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<SignupForm />)
+
+</script>
+</body>
 </html>
