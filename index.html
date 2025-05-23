@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Grow a Garden - Signup</title>
+<title>Grow a Garden - Sign Up</title>
 <style>
 body {
   background-color: black;
@@ -78,23 +78,24 @@ body.alert-active .custom-alert-overlay {
 }
 form {
   max-width: 400px;
-  margin: 40px auto;
+  margin: auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
-input {
-  background-color: #1a1a1a;
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  padding: 10px;
+  border-radius: 5px;
   border: 2px solid lightslategray;
-  padding: 15px 10px;
+  font-family: 'Times New Roman', Times, serif;
   font-size: 16px;
-  color: white;
-  border-radius: 8px;
-}
-label {
   color: gray;
-  font-weight: bold;
-  font-size: 14px;
+  background-color: #222;
+}
+input::placeholder {
+  color: gray;
 }
 </style>
 <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -104,139 +105,88 @@ label {
 </head>
 <body>
 <div id="root"></div>
-
-<script type="text/babel" data-type="module" data-presets="react,typescript">
-
-const { useState, useEffect, useRef } = React
-
+<script type="text/babel" data-presets="react,typescript">
+const { useState, useEffect } = React
 function CustomAlert({ message, onClose }) {
   useEffect(() => {
     document.body.classList.add('alert-active')
     return () => document.body.classList.remove('alert-active')
   }, [])
   return (
-    <div className="custom-alert-overlay">
-      <div className="custom-alert-box">
+    <div className="custom-alert-overlay" onClick={onClose}>
+      <div className="custom-alert-box" onClick={e => e.stopPropagation()}>
         <p>{message}</p>
-        <button className="custom-alert-button" onClick={onClose}>Close</button>
+        <button className="custom-alert-button" onClick={onClose}>OK</button>
       </div>
     </div>
   )
 }
-
-export default function SignupForm() {
+function SignUp() {
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [alert, setAlert] = useState(null)
-  const turnstileRef = useRef(null)
-  const [token, setToken] = useState(null)
-
+  const [error, setError] = useState('')
+  const [captchaToken, setCaptchaToken] = useState('')
+  const [alertMessage, setAlertMessage] = useState('')
   useEffect(() => {
-    if(window.turnstile && turnstileRef.current) {
-      window.turnstile.render(turnstileRef.current, {
-        sitekey: "0x4AAAAAABeDBe4pSr2MmYDv", 
-        callback: (token) => setToken(token),
-        'error-callback': () => setToken(null),
-        'expired-callback': () => setToken(null)
-      })
-    }
+    window.turnstile?.render('#captcha', {
+      sitekey: '0x4AAAAAABeDBe4pSr2MmYDv',
+      callback: (token) => setCaptchaToken(token),
+      'error-callback': () => setCaptchaToken(''),
+      'expired-callback': () => setCaptchaToken('')
+    })
   }, [])
-
-  function validateEmail(email) {
-    return /\S+@\S+\.\S+/.test(email)
+  function validateEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
   }
-
-  function validateUsername(name) {
-    return name.length >= 3 && /^[a-zA-Z0-9_]+$/.test(name)
+  function validateUsername(u) {
+    return /^[a-zA-Z0-9_]{3,20}$/.test(u)
   }
-
-  function validatePassword(pw) {
-    return pw.length >= 6
+  function validatePassword(p) {
+    return p.length >= 6
   }
-
-  async function onSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    if(!validateEmail(email)) {
-      setAlert("Enter a valid email")
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email.')
       return
     }
-    if(!validateUsername(username)) {
-      setAlert("Username must be 3+ characters, alphanumeric or underscore")
+    if (!validateUsername(username)) {
+      setError('Username must be 3-20 chars and contain only letters, numbers, underscores.')
       return
     }
-    if(!validatePassword(password)) {
-      setAlert("Password must be at least 6 characters")
+    if (!validatePassword(password)) {
+      setError('Password must be at least 6 characters.')
       return
     }
-    if(!token) {
-      setAlert("Please complete the CAPTCHA")
+    if (!captchaToken) {
+      setError('Please complete the CAPTCHA.')
       return
     }
-
+    setError('')
     try {
-      await fakeSignup({ email, username, password, captchaToken: token })
-      setAlert("Signup successful!")
-      setEmail('')
-      setUsername('')
-      setPassword('')
-      setToken(null)
-      if(window.turnstile) {
-        window.turnstile.reset()
-      }
+      await new Promise(r => setTimeout(r, 500))
+      window.location.href = 'https://grow-a-garden-fanmade.pages.dev'
     } catch {
-      setAlert("Signup failed. Try again later.")
+      setAlertMessage('Sign up failed, try again.')
     }
   }
-
-  async function fakeSignup(data) {
-    return new Promise((resolve) => setTimeout(resolve, 1000))
-  }
-
   return (
     <>
-      {alert && <CustomAlert message={alert} onClose={() => setAlert(null)} />}
       <h1>Grow a Garden - Sign Up</h1>
-      <form onSubmit={onSubmit} noValidate>
-        <label htmlFor="email">Email</label>
-        <input 
-          id="email" 
-          type="email" 
-          value={email} 
-          onChange={e => setEmail(e.target.value)} 
-          required
-          autoComplete="email"
-          spellCheck="false"
-        />
-        <label htmlFor="username">Username</label>
-        <input 
-          id="username" 
-          type="text" 
-          value={username} 
-          onChange={e => setUsername(e.target.value)} 
-          required
-          spellCheck="false"
-          autoComplete="username"
-        />
-        <label htmlFor="password">Password</label>
-        <input 
-          id="password" 
-          type="password" 
-          value={password} 
-          onChange={e => setPassword(e.target.value)} 
-          required
-          autoComplete="new-password"
-        />
-        <div ref={turnstileRef} />
-        <button onclick="window.location.href='https://grow-a-garden-fanmade.pages.dev/mainpage'">Sign Up</button>
-        
+      <form onSubmit={handleSubmit} noValidate>
+        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+        <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required minLength={3} maxLength={20} pattern="[a-zA-Z0-9_]+" />
+        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+        <div id="captcha"></div>
+        <button type="submit">Sign Up</button>
       </form>
+      {error && <p style={{color:'red', marginTop:'10px', textAlign:'center'}}>{error}</p>}
+      {alertMessage && <CustomAlert message={alertMessage} onClose={() => setAlertMessage('')} />}
     </>
   )
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<SignupForm />)
-
+ReactDOM.createRoot(document.getElementById('root')).render(<SignUp />)
 </script>
 </body>
 </html>
