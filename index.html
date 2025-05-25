@@ -1,130 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+<title>Grow a Garden</title>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Grow a Garden - Sign Up</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<link rel="stylesheet" href="style.css">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<style>
-  body {
-    background-color: black;
-    border: 2px solid lightslategray;
-    padding: 15px 20px;
-    font-family: 'Times New Roman', Times, serif;
-    color: gray;
-  }
-  h1, h2, p {
-    color: gray;
-  }
-  button {
-    background-color: #2c2c2c;
-    border: 2px solid #1a1a1a;
-    color: #f5f5f5;
-    padding: 15px 20px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-  }
-  button:hover {
-    background-color: #3d3d3d;
-    border-color: #444;
-    color: #ffffff;
-  }
-  button:active {
-    background-color: #1a1a1a;
-    border-color: #555;
-    color: #dddddd;
-  }
-</style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel" data-type="module" data-presets="react,typescript">
-  const { useState } = React;
+    <div class="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <p id="custom-alert-message">Default message</p>
+        <button class="custom-alert-button" onclick="closeCustomAlert()">Close</button>
+    </div>
+  </div>
+    <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+    <script>
+        function alert(message) {
+            document.getElementById("custom-alert-message").textContent = message;
+            document.body.classList.add("alert-active");
+            document.getElementById("alert-sound").play();
+        }
+        
+        function closeCustomAlert() {
+            document.body.classList.remove("alert-active");
+        }
+    </script>
+  <script>
+    import express from 'express'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-  function SignUpForm() {
-    const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-    function validateEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-    function validateUsername(name) {
-      return name.length >= 3;
-    }
-    function validatePassword(pw) {
-      return pw.length >= 6;
-    }
+const app = express()
+const port = 3000
 
-    async function handleSubmit(e) {
-      e.preventDefault();
-      setError('');
-      if (!validateEmail(email)) {
-        setError('Invalid email');
-        return;
-      }
-      if (!validateUsername(username)) {
-        setError('Username must be at least 3 characters');
-        return;
-      }
-      if (!validatePassword(password)) {
-        setError('Password must be at least 6 characters');
-        return;
-      }
-      const turnstileResponse = window.turnstile && window.turnstile.getResponse();
-      if (!turnstileResponse) {
-        setError('Complete the CAPTCHA');
-        return;
-      }
-      setLoading(true);
-      await new Promise(res => setTimeout(res, 800));
-      window.location.href = "https://grow-a-garden-fanmade.pages.dev/mainpage";
-    }
+app.use(express.static(path.join(__dirname, 'public')))
 
-    return (
-      <form onSubmit={handleSubmit} style={{maxWidth: '400px', margin: 'auto'}}>
-        <h1>Grow a Garden - Sign Up</h1>
-        {error && <p style={{color: 'red'}}>{error}</p>}
-        <label>Email</label><br />
-        <input
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          style={{width: '100%', padding: '10px', marginBottom: '10px'}}
-          required
-        /><br />
-        <label>Username</label><br />
-        <input
-          type="text"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          style={{width: '100%', padding: '10px', marginBottom: '10px'}}
-          required
-        /><br />
-        <label>Password</label><br />
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          style={{width: '100%', padding: '10px', marginBottom: '10px'}}
-          required
-        /><br />
-        <div
-          className="cf-turnstile" data-sitekey="0x4AAAAAABeDBe4pSr2MmYDv"
-          style={{marginBottom: '10px'}}
-        ></div>
-        <button type="submit" disabled={loading}>{loading ? 'Signing up...' : 'Sign Up'}</button>
-      </form>
-    );
-  }
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
 
-  ReactDOM.createRoot(document.getElementById('root')).render(<SignUpForm />);
-</script>
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`)
+})
+  </script>
+  <script>
+    alert('Welcome to a Fanmade grow a garden page! Press close to close this message.')
+  </script>
+  <h1>Main Page 🔖</h1>
+<h2>Two more weeks…</h2>
+<p>It was been 7 days since the last update.
+Welcome to a Grow a Garden Fanmade Page, all the code is written by me/hg but press These Buttons for extra info!</p> 
+<h2>Getting Started</h2>
+<p><strong>Planting</strong> Use seeds on empty dirt tiles to grow crops  
+<strong>Harvesting</strong> Collect crops when fully grown  
+<strong>Selling</strong> Sell crops for Sheckles, the in-game currency  
+<strong>Upgrading</strong> Use Sheckles to buy better seeds, gear, and expand your farm</p>
+
+<h2>Weather and Mutations</h2>
+<p><strong>No Weather</strong> Normal growth  
+<strong>Rain</strong> Crops grow 50% faster and may develop the Wet mutation (double value)  
+<strong>Thunderstorm</strong> Can trigger the Shocked mutation (100x value)</p>
+
+<h2>Crop Mutations</h2>
+<p><strong>Normal</strong> Standard crops  
+<strong>Big</strong> Larger, more valuable crops  
+<strong>Wet</strong> Grows in rain, doubles value  
+<strong>Golden</strong> 1% chance, 20x value  (including 20x of all mutations)
+<strong>Shocked</strong> From thunderstorms, 50x value  
+<strong>Rainbow</strong> 0.1% chance, 50x value (including 50x of all mutations)</p>
+
+<h2>Gear and Tools</h2>
+<p><strong>Watering Can</strong> Speeds up growth  
+<strong>Sprinklers</strong> Increase growth and mutation odds  
+<strong>Trowel</strong> Move plants
+<strong>Shovel</strong> Remove plants  
+<strong>Lightning Rod</strong> Increases chance for Shocked mutation</p>
+
+<h2>Pets</h2>
+<p>Provide farming boosts
+Examples include Dog (+15% harvest) Bee (+25% reproduction) Fox (+30% selling price)</p>
+
+<h2>Strategies</h2>
+<p>Use mutations to boost profits  
+Play during storms for higher mutation chances  
+Use gear effectively  
+Team up with friends for cash bonuses.</p>
+  <div class="cf-turnstile" data-sitekey="0x4AAAAAABeDBe4pSr2MmYDv"></div>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <img src='https://i.postimg.cc/dVqJsQQX/IMG-1858.webp' border='0' alt='IMG-1858'/></img><br>
+  <button onclick="window.location.href='https://github.com/hgfghhccchgtjcdfhhhh/grow-a-garden-fanmade/blob/main/README.md'">More Info!</button>
+<button onclick="window.location.href='https://www.roblox.com/games/126884695634066/Grow-a-Garden'">Subscribe to the update.</button>
+  <button onclick="window.location.href='https://growagarden.fandom.com'">Grow a Garden Wiki</button><br>
+  <button onclick="window.location.href='https://github.com/hgfghhccchgtjcdfhhhh/grow-a-garden-fanmade/blob/main/LICENSE'">Apache License 2.0</button>
+  <button onclick="window.location.htef='https://discord.gg/giftcard'">Grow a Garden Dc Server</button>
+  <button onclick="window.location.href='candy-blossom.html'">Candy Blossom Info</button>
 </body>
 </html>
